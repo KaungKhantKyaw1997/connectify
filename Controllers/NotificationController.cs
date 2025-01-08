@@ -19,7 +19,7 @@ namespace RealTimeNotifications.Controllers
         [HttpPost("send")]
         public async Task<IActionResult> SendNotification([FromBody] Notification notification)
         {
-            await _hubContext.Clients.All.SendAsync("ReceiveNotification", $"{notification.Title}: {notification.Message}");
+            await _hubContext.Clients.All.SendAsync("ReceiveNotification", notification);
             return Ok(new { Status = "Notification sent" });
         }
     }

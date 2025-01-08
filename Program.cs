@@ -24,7 +24,7 @@ app.MapHub<NotificationHub>("/notifications");
 
 app.MapPost("/send-notification", async (Notification notification, IHubContext<NotificationHub> hubContext) =>
 {
-    await hubContext.Clients.All.SendAsync("ReceiveNotification", $"{notification.Title}: {notification.Message}");
+    await hubContext.Clients.All.SendAsync("ReceiveNotification", notification);
     return Results.Ok(new { Status = "Notification sent" });
 });
 
