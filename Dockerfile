@@ -6,13 +6,19 @@ EXPOSE 80
 # Use the .NET 9.0 SDK image for building the app
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY ["Connectify.csproj", "Connectify/"]
-RUN dotnet restore "Connectify/Connectify.csproj"
+
+# Copy the project file and restore dependencies
+COPY ["Connectify.csproj", "./"]
+RUN dotnet restore "Connectify.csproj"
+
+# Copy the rest of the application code
 COPY . .
-WORKDIR "/src/Connectify"
+
+# Build the application
+WORKDIR "/src"
 RUN dotnet build "Connectify.csproj" -c Release -o /app/build
 
-# Publish the app
+# Publish the application
 FROM build AS publish
 RUN dotnet publish "Connectify.csproj" -c Release -o /app/publish
 
