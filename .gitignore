@@ -1,0 +1,17 @@
+# Ignore build outputs
+bin/
+obj/
+
+# Ignore logs
+*.log
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
+
+# Ignore temporary system files
+*.ds_store
+Thumbs.db
+
+# Ignore publish output
+publish/
