@@ -1,12 +1,18 @@
 using Microsoft.AspNetCore.SignalR;
 using RealTimeNotifications.Models;
 using System.Collections.Concurrent;
+using System.Linq;
 
 namespace RealTimeNotifications.Hubs
 {
     public class NotificationHub : Hub
     {
         private static readonly ConcurrentDictionary<string, string> UserConnections = new();
+
+        public static bool TryGetConnectionId(string userId, out string connectionId)
+        {
+            return UserConnections.TryGetValue(userId, out connectionId);
+        }
 
         public override Task OnConnectedAsync()
         {
@@ -15,6 +21,11 @@ namespace RealTimeNotifications.Hubs
             if (!string.IsNullOrEmpty(userId))
             {
                 UserConnections[userId] = Context.ConnectionId;
+                Console.WriteLine($"User {userId} connected with connection ID: {Context.ConnectionId}");
+            }
+            else
+            {
+                Console.WriteLine("No userId provided for connection.");
             }
 
             return base.OnConnectedAsync();
@@ -26,6 +37,12 @@ namespace RealTimeNotifications.Hubs
             if (!item.Equals(default(KeyValuePair<string, string>)))
             {
                 UserConnections.TryRemove(item.Key, out _);
+                Console.WriteLine($"User {item.Key} disconnected from connection ID: {Context.ConnectionId}");
+            }
+
+            if (exception != null)
+            {
+                Console.WriteLine($"An error occurred during disconnect: {exception.Message}");
             }
 
             return base.OnDisconnectedAsync(exception);

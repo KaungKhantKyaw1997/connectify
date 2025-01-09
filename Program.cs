@@ -32,7 +32,14 @@ app.MapPost("/api/notifications/send", async (Notification notification, IHubCon
     }
     else
     {
-        await hubContext.Clients.User(notification.UserId).SendAsync("ReceiveNotificationForUser", notification);
+        if (NotificationHub.TryGetConnectionId(notification.UserId, out string connectionId))
+        {
+            await hubContext.Clients.Client(connectionId).SendAsync("ReceiveNotificationForUser", notification);
+        }
+        else
+        {
+            return Results.NotFound(new { success = false, message = "User not connected" });
+        }
     }
 
     return Results.Ok(new
