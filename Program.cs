@@ -6,6 +6,7 @@ using RealTimeNotifications.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSignalR();
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -31,7 +32,7 @@ app.MapPost("/api/notifications/send", async (Notification notification, IHubCon
     }
     else
     {
-        await hubContext.Clients.User(notification.UserId).SendAsync("ReceiveNotification", notification);
+        await hubContext.Clients.User(notification.UserId).SendAsync("ReceiveNotificationForUser", notification);
     }
 
     return Results.Ok(new

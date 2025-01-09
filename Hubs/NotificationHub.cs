@@ -35,8 +35,13 @@ namespace RealTimeNotifications.Hubs
         {
             if (UserConnections.TryGetValue(userId, out string? connectionId))
             {
-                await Clients.Client(connectionId).SendAsync("ReceiveNotification", notification);
+                await Clients.Client(connectionId).SendAsync("ReceiveNotificationForUser", notification);
             }
+        }
+
+        public async Task SendBroadcastNotification(Notification notification)
+        {
+            await Clients.All.SendAsync("ReceiveNotification", notification);
         }
     }
 }

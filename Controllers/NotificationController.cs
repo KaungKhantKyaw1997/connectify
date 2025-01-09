@@ -25,7 +25,7 @@ namespace RealTimeNotifications.Controllers
             }
             else
             {
-                await _hubContext.Clients.User(notification.UserId).SendAsync("ReceiveNotification", notification);
+                await _hubContext.Clients.User(notification.UserId).SendAsync("ReceiveNotificationForUser", notification);
             }
 
             return Ok(new
