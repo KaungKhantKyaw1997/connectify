@@ -1,13 +1,42 @@
 using Microsoft.AspNetCore.SignalR;
 using RealTimeNotifications.Models;
+using System.Collections.Concurrent;
 
 namespace RealTimeNotifications.Hubs
 {
     public class NotificationHub : Hub
     {
-        public async Task SendNotification(Notification notification)
+        private static readonly ConcurrentDictionary<string, string> UserConnections = new();
+
+        public override Task OnConnectedAsync()
         {
-            await Clients.All.SendAsync("ReceiveNotification", notification);
+            string? userId = Context.GetHttpContext()?.Request.Query["userId"];
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                UserConnections[userId] = Context.ConnectionId;
+            }
+
+            return base.OnConnectedAsync();
+        }
+
+        public override Task OnDisconnectedAsync(Exception? exception)
+        {
+            var item = UserConnections.FirstOrDefault(x => x.Value == Context.ConnectionId);
+            if (!item.Equals(default(KeyValuePair<string, string>)))
+            {
+                UserConnections.TryRemove(item.Key, out _);
+            }
+
+            return base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task SendNotificationToUser(string userId, Notification notification)
+        {
+            if (UserConnections.TryGetValue(userId, out string? connectionId))
+            {
+                await Clients.Client(connectionId).SendAsync("ReceiveNotification", notification);
+            }
         }
     }
 }

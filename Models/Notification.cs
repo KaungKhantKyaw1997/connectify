@@ -1,4 +1,4 @@
 namespace RealTimeNotifications.Models
 {
-    public record Notification(string Title, string Message);
+    public record Notification(string Title, string Message, string? UserId = null);
 }

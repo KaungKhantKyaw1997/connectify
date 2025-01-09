@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using RealTimeNotifications.Hubs;
 using RealTimeNotifications.Models;
 
@@ -19,8 +19,21 @@ namespace RealTimeNotifications.Controllers
         [HttpPost("send")]
         public async Task<IActionResult> SendNotification([FromBody] Notification notification)
         {
-            await _hubContext.Clients.All.SendAsync("ReceiveNotification", notification);
-            return Ok(new { Status = "Notification sent" });
+            if (string.IsNullOrEmpty(notification.UserId))
+            {
+                await _hubContext.Clients.All.SendAsync("ReceiveNotification", notification);
+            }
+            else
+            {
+                await _hubContext.Clients.User(notification.UserId).SendAsync("ReceiveNotification", notification);
+            }
+
+            return Ok(new
+            {
+                success = true,
+                message = "Notification sent successfully",
+                data = notification
+            });
         }
     }
 }

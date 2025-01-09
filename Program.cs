@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using RealTimeNotifications.Hubs;
 using RealTimeNotifications.Models;
 
@@ -22,10 +23,23 @@ app.UseCors();
 
 app.MapHub<NotificationHub>("/notifications");
 
-app.MapPost("/send-notification", async (Notification notification, IHubContext<NotificationHub> hubContext) =>
+app.MapPost("/api/notifications/send", async (Notification notification, IHubContext<NotificationHub> hubContext) =>
 {
-    await hubContext.Clients.All.SendAsync("ReceiveNotification", notification);
-    return Results.Ok(new { Status = "Notification sent" });
+    if (string.IsNullOrEmpty(notification.UserId))
+    {
+        await hubContext.Clients.All.SendAsync("ReceiveNotification", notification);
+    }
+    else
+    {
+        await hubContext.Clients.User(notification.UserId).SendAsync("ReceiveNotification", notification);
+    }
+
+    return Results.Ok(new
+    {
+        success = true,
+        message = "Notification sent successfully",
+        data = notification
+    });
 });
 
 app.Run();
