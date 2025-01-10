@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 using RealTimeNotifications.Models;
 using System.Collections.Concurrent;
-using System.Linq;
 
 namespace RealTimeNotifications.Hubs
 {

@@ -26,4 +26,9 @@ RUN dotnet publish "Connectify.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Connectify.dll"]
+
+# Set environment to ensure Swagger works
+ENV DOTNET_ENVIRONMENT Development
+
+# Start the application
+ENTRYPOINT ["dotnet", "Connectify.dll", "--urls", "http://0.0.0.0:80"]

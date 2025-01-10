@@ -32,17 +32,17 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Real-Time Notifications API V1");
-        options.RoutePrefix = string.Empty;
-    });
-}
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Real-Time Notifications API V1");
+    options.RoutePrefix = string.Empty;
+});
 
 app.UseCors();
+
+var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
+app.Urls.Add($"http://*:{port}");
 
 app.MapHub<NotificationHub>("/notifications");
 
