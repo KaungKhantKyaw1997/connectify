@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 using RealTimeNotifications.Hubs;
 using RealTimeNotifications.Models;
 
@@ -18,7 +19,28 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Real-Time Notifications API",
+        Version = "v1",
+        Description = "An API to send real-time notifications using SignalR",
+    });
+});
+
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Real-Time Notifications API V1");
+        options.RoutePrefix = string.Empty;
+    });
+}
 
 app.UseCors();
 
@@ -48,6 +70,8 @@ app.MapPost("/api/notifications/send", async (Notification notification, IHubCon
         message = "Notification sent successfully",
         data = notification
     });
-});
+})
+.WithName("SendNotification")
+.WithOpenApi();
 
 app.Run();
